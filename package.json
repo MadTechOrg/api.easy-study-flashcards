@@ -1,12 +1,13 @@
 {
-  "name": "adonis-api-app",
+  "name": "api.easy-study-flashcards",
   "version": "4.1.0",
   "adonis-version": "4.1.0",
-  "description": "Adonisjs boilerplate for API server with pre-configured JWT",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node ace test"
+    "test": "node ace test",
+    "lint": "eslint '**/*.js' --format=stylish"
   },
   "keywords": [
     "adonisjs",
@@ -25,7 +26,11 @@
     "@adonisjs/ignitor": "^2.0.8",
     "@adonisjs/lucid": "^6.1.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2"
+  },
   "autoload": {
     "App": "./app"
   }
