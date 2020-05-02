@@ -1,5 +1,9 @@
 # Node modules
 node_modules
+.npm
+.config
+data
+dump
 
 # Adonis directory for storing tmp files
 tmp
