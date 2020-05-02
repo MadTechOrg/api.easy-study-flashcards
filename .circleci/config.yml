@@ -1,0 +1,131 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.10.0
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_USER: "edgard"
+          POSTGRES_PASSWORD: "edgard"
+          POSTGRES_DB: "edgard"
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+
+      - run:
+          name: npm install
+          command: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run:
+          name: set-environment-variables
+          command: |
+            echo 'export HOST=localhost' >> $BASH_ENV
+            echo 'export PORT=3333' >> $BASH_ENV
+            echo 'export NODE_ENV=development' >> $BASH_ENV
+            echo 'export APP_NAME=easy-study-flashcards' >> $BASH_ENV
+            echo 'export APP_URL=http://${HOST}:${PORT}' >> $BASH_ENV
+            echo 'export CACHE_VIEWS=false' >> $BASH_ENV
+            echo 'export APP_KEY=P3BgjnddxP0IjISjSfZJQDpEt81EatPb' >> $BASH_ENV
+            echo 'export DB_CONNECTION=pg' >> $BASH_ENV
+            echo 'export DB_HOST=127.0.0.1' >> $BASH_ENV
+            echo 'export DB_PORT=5432' >> $BASH_ENV
+            echo 'export DB_USER=edgard' >> $BASH_ENV
+            echo 'export DB_PASSWORD=edgard' >> $BASH_ENV
+            echo 'export DB_DATABASE=edgard' >> $BASH_ENV
+            echo 'export HASH_DRIVER=bcrypt' >> $BASH_ENV
+
+      - run:
+          name: copy env file
+          command: |
+            cp $BASH_ENV .env
+            cat .env
+
+      - run:
+          name: Wait for Postgres to start
+          command: dockerize -wait tcp://127.0.0.1:5432 -timeout 1m
+
+      - run:
+          name: prepare database
+          command: |
+            node ace migration:run --force
+
+  linters:
+    docker:
+      - image: circleci/node:8.10.0
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_USER: "edgard"
+          POSTGRES_PASSWORD: "edgard"
+          POSTGRES_DB: "edgard"
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+
+      - run:
+          name: npm install
+          command: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+
+      - run:
+          name: set-environment-variables
+          command: |
+            echo 'export HOST=0.0.0.0' >> $BASH_ENV
+            echo 'export PORT=3333' >> $BASH_ENV
+            echo 'export NODE_ENV=development' >> $BASH_ENV
+            echo 'export APP_NAME=easy-study-flashcards' >> $BASH_ENV
+            echo 'export APP_URL=http://${HOST}:${PORT}' >> $BASH_ENV
+            echo 'export CACHE_VIEWS=false' >> $BASH_ENV
+            echo 'export APP_KEY=P3BgjnddxP0IjISjSfZJQDpEt81EatPb' >> $BASH_ENV
+            echo 'export DB_CONNECTION=pg' >> $BASH_ENV
+            echo 'export DB_HOST=postgres' >> $BASH_ENV
+            echo 'export DB_PORT=5432' >> $BASH_ENV
+            echo 'export DB_USER=edgard' >> $BASH_ENV
+            echo 'export DB_PASSWORD=edgard' >> $BASH_ENV
+            echo 'export DB_DATABASE=edgard' >> $BASH_ENV
+            echo 'export HASH_DRIVER=bcrypt' >> $BASH_ENV
+
+      - run:
+          name: lint
+          command: npm run lint
+          when: always
+
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+      - linters:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
