@@ -17,3 +17,4 @@
 const Route = use('Route')
 
 Route.get('/example', () => ({ greeting: 'Hello World' }))
+Route.post('/user', 'UserController.create')
