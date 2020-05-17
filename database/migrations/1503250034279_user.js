@@ -14,13 +14,12 @@ class UserSchema extends Schema {
       table.string('gender', 1).nullable()
       table.string('photo_url').nullable()
       table.string('language', 10).notNullable().defaultTo('en')
-      table.json('notification').nullable()
+      table.json('notification').nullable().defaultTo('[]')
       table.json('frequency').notNullable().defaultTo('[]')
       table.string('provider_id').nullable()
       table.string('provider_name').nullable()
       table.boolean('first_login').notNullable().defaultTo(true)
       table.boolean('premium').notNullable().defaultTo(false)
-
       table.timestamps()
     })
   }

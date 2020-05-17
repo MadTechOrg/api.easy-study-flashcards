@@ -1,37 +1,41 @@
 'use strict'
 
-const User = use('App/Models/User')
-const { validateAll } = use('Validator')
+const UserService = use('App/Services/UserService')
+const ForbiddenException = use('App/Exceptions/ForbiddenException')
+
+const { equals } = require('ramda')
 
 class UserController {
-  async create({ request, response }) {
-    try {
-      const errorMessages = {
-        'name.required': 'required_field',
-        'name.min': 'min_length_2',
-        'email.required': 'required_field',
-        'email.email': 'invalid_email',
-        'email.unique': 'instance_already_exists',
-        'password.required': 'required_field',
-        'password.min': 'min_length_6',
-      }
+  constructor() {
+    this.userService = UserService
+  }
 
-      const validation = await validateAll(request.all(), {
-        name: 'required|min:2',
-        email: 'required|email|unique:users',
-        password: 'required|min:6',
-      }, errorMessages)
-
-      if (validation.fails()) {
-        return response.status(400).send({ message: validation.messages() })
-      }
-
-      const data = request.only(['name', 'email', 'password', 'providerId', 'providerName'])
-      const user = await User.create(data)
-      return user
-    } catch (err) {
-      return response.status(400).send({ error: `Error: ${err.message}` })
+  async show({ params, response, auth }) {
+    if (equals(params.id, auth.user.id)) {
+      const user = await this.userService.show(params.id)
+      return response.json({
+        user,
+      })
     }
+    throw new ForbiddenException()
+  }
+
+  async update({
+    params, request, response, auth,
+  }) {
+    if (equals(params.id, auth.user.id)) {
+      const attributes = request.only([
+        'name',
+        'birth_date',
+        'language',
+        'gender',
+        'photo_url',
+        'first_login',
+      ])
+      const user = await this.userService.update(params.id, attributes)
+      return response.json({ user })
+    }
+    throw new ForbiddenException()
   }
 }
 
