@@ -13,7 +13,9 @@ const Server = use('Server')
 |
 */
 const globalMiddleware = [
+  'App/Middleware/SpoofAccept',
   'Adonis/Middleware/BodyParser',
+  'App/Middleware/TrimString',
   'App/Middleware/ConvertEmptyStringsToNull',
 ]
 

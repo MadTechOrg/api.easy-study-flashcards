@@ -16,5 +16,12 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/example', () => ({ greeting: 'Hello World' }))
-Route.post('/user', 'UserController.create')
+Route.post('/session', 'AuthController.login').validator('LoginUser')
+Route.post('/register', 'AuthController.register').validator('RegisterUser')
+Route.delete('/session', 'AuthController.logout')
+Route.resource('user', 'UserController')
+  .apiOnly()
+  .middleware('auth')
+  .validator(new Map([
+    [['user.update'], ['UpdateUser']],
+  ]))
