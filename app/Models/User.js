@@ -14,7 +14,7 @@ class Users extends Model {
         userInstance.password = await Hash.make(userInstance.password)
       }
     })
-    this.addHook('beforeSave', 'IdGeneratorHook.uuid')
+    this.addHook('beforeCreate', 'IdGeneratorHook.uuid')
   }
 
   static get primaryKey() {
@@ -29,16 +29,6 @@ class Users extends Model {
     return ['password']
   }
 
-  /**
-   * A relationship on tokens is required for auth to
-   * work. Since features like `refreshTokens` or
-   * `rememberToken` will be saved inside the
-   * tokens table.
-   *
-   * @method tokens
-   *
-   * @return {Object}
-   */
   tokens() {
     return this.hasMany('App/Models/Token')
   }
