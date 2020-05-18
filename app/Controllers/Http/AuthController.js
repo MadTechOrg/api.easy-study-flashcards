@@ -27,6 +27,16 @@ class AuthController {
     const authentication = await this.authService.authenticate({ email, password }, auth)
     return response.json(authentication)
   }
+
+  async forgot({ request }) {
+    const email = request.input('email')
+    await this.authService.forgot(email)
+  }
+
+  async reset({ request }) {
+    const data = request.only(['token', 'password'])
+    await this.authService.reset(data)
+  }
 }
 
 module.exports = AuthController

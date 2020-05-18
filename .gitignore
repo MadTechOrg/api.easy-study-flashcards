@@ -10,6 +10,8 @@ tmp
 
 # Environment variables, never commit this file
 .env
+.env.docker
+.bash_history
 
 # The development sqlite file
 database/*.sqlite

@@ -18,6 +18,8 @@ const Route = use('Route')
 
 Route.post('/session', 'AuthController.login').validator('LoginUser')
 Route.post('/register', 'AuthController.register').validator('RegisterUser')
+Route.post('/forgot', 'AuthController.forgot').validator('ForgotPassword')
+Route.post('/reset', 'AuthController.reset').validator('ResetPassword')
 Route.delete('/session', 'AuthController.logout')
 Route.resource('user', 'UserController')
   .apiOnly()

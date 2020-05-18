@@ -16,7 +16,9 @@ class UserService {
 
   async update(userId, attributes) {
     try {
-      await User.query().where('id', userId).update(attributes)
+      const user = await User.find(userId)
+      user.merge(attributes)
+      await user.save()
       return User.find(userId)
     } catch (error) {
       throw new BadRequestException()
