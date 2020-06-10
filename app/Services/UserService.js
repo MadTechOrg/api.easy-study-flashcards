@@ -32,6 +32,15 @@ class UserService {
       throw new NotFoundException()
     }
   }
+
+  async findByProvider({ providerId, provider }) {
+    return User.query()
+      .where({
+        provider_name: provider,
+        provider_id: providerId,
+      })
+      .first()
+  }
 }
 
 module.exports = new UserService(Config)
